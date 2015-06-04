@@ -141,16 +141,16 @@ int iterate_post(void *coninfo_cls, enum MHD_ValueKind kind, const char *key,
         con_info->answer = strdup("Public key received!\n");
         pcs_t_import_public_key(p->pk, p->public_key.c_str());
     }
-    else if (strcmp(key, "vote") == 0) {
+    else if (strcmp(key, "vote") == 0 && size != 0) {
         p->add_vote(string(data));
         con_info->answer = strdup("Vote received!\n");
     }
-    else if (strcmp(key, "share") == 0) {
+    else if (strcmp(key, "share") == 0  && size != 0) {
         printf("%s\n", data);
         p->add_share(string(data));
         con_info->answer = strdup("Share received!\n");
-        printf("%lu shares remaining\n", p->pk->l - p->servers_seen++);
-        if (p->servers_seen == p->pk->l)
+        printf("%d shares received\n", ++p->servers_seen);
+        if (p->servers_seen >= p->pk->w)
             printf("No more servers required, can tally votes\n");
     }
     else {
