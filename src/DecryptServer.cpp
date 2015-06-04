@@ -39,8 +39,17 @@ WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
     return realsize;
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s <server-addr> <board-addr>\n", argv[0]);
+        return 1;
+    }
+
+    const char *addr_server = argv[1];
+    const char *addr_board  = argv[2];
+
+    char snpbuf[256];
     srand(time(NULL));
 
     CURL *curl_handle;
@@ -62,7 +71,8 @@ int main(void)
 #endif
 
     /* specify URL to get */
-    curl_easy_setopt(curl_handle, CURLOPT_URL, "http://127.0.0.1:40000/get_auth_cred");
+    snprintf(snpbuf, 256, "http://%s/get_auth_cred", addr_server);
+    curl_easy_setopt(curl_handle, CURLOPT_URL, snpbuf);
 
     /* send all data to this function  */
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
@@ -104,7 +114,8 @@ int main(void)
     /* Now, repeatedly check the public board until the vote is considered
      * over. Once the vote is over, then proceed with retrieving the tally
      * and getting the shared */
-    curl_easy_setopt(curl_handle, CURLOPT_URL, "http://127.0.0.1:40001/get_vote_status");
+    snprintf(snpbuf, 256, "http://%s/get_vote_status", addr_board);
+    curl_easy_setopt(curl_handle, CURLOPT_URL, snpbuf);
 
     do {
         if (chunk.memory) { free(chunk.memory); chunk.memory = NULL; }
@@ -122,7 +133,8 @@ int main(void)
     chunk.memory = (char*)malloc(1);
     chunk.size = 0;
 
-    curl_easy_setopt(curl_handle, CURLOPT_URL, "http://127.0.0.1:40001/get_public_key");
+    snprintf(snpbuf, 256, "http://%s/get_public_key", addr_board);
+    curl_easy_setopt(curl_handle, CURLOPT_URL, snpbuf);
     curl_easy_perform(curl_handle);
 
     if (res != CURLE_OK) {
@@ -141,7 +153,8 @@ int main(void)
     chunk.memory = (char*)malloc(1);
     chunk.size = 0;
 
-    curl_easy_setopt(curl_handle, CURLOPT_URL, "http://127.0.0.1:40001/get_vote_tally");
+    snprintf(snpbuf, 256, "http://%s/get_vote_tally", addr_board);
+    curl_easy_setopt(curl_handle, CURLOPT_URL, snpbuf);
     curl_easy_perform(curl_handle);
 
     if (res != CURLE_OK) {
@@ -159,7 +172,8 @@ int main(void)
     char *data = mpz_get_str(NULL, 62, tally);
     string s = "share=" + string(data);
 
-    curl_easy_setopt(curl_handle, CURLOPT_URL, "http://127.0.0.1:40001/post_share");
+    snprintf(snpbuf, 256, "http://%s/post_share", addr_board);
+    curl_easy_setopt(curl_handle, CURLOPT_URL, snpbuf);
     /* Now specify the POST data */
     curl_easy_setopt(curl_handle, CURLOPT_POSTFIELDS, s.c_str());
     curl_easy_setopt(curl_handle, CURLOPT_POSTFIELDSIZE, s.length());

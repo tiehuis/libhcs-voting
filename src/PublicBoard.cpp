@@ -232,12 +232,18 @@ int sate_request(void *cls, struct MHD_Connection *connection,
     return send_page(connection, errormsg);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s <port>\n", argv[0]);
+        return 1;
+    }
+
     p = new PublicBoard();
+    const int port_arg = atoi(argv[1]);
     struct MHD_Daemon *daemon;
 
-    daemon = MHD_start_daemon(MHD_USE_SELECT_INTERNALLY, 40001,
+    daemon = MHD_start_daemon(MHD_USE_SELECT_INTERNALLY, port_arg,
             NULL, NULL, &sate_request, NULL, MHD_OPTION_NOTIFY_COMPLETED,
             &request_completed, NULL, MHD_OPTION_END);
 

@@ -69,8 +69,13 @@ WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 
 int main(int argc, char *argv[])
 {
-    if (argc < 2) { printf("VoterClient <vote>\n"); return 1; }
+    if (argc < 3) {
+        printf("VoterClient <board-addr> <vote>\n");
+        return 1;
+    }
 
+    const char *addr = argv[1];
+    char snpbuf[256];
     CURL *curl_handle;
     CURLcode res;
 
@@ -85,7 +90,8 @@ int main(int argc, char *argv[])
     curl_handle = curl_easy_init();
 
     /* specify URL to get */
-    curl_easy_setopt(curl_handle, CURLOPT_URL, "http://127.0.0.1:40001/get_public_key");
+    snprintf(snpbuf, 256, "http://%s/get_public_key", addr);
+    curl_easy_setopt(curl_handle, CURLOPT_URL, snpbuf);
 
     /* send all data to this function  */
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
@@ -122,7 +128,7 @@ int main(int argc, char *argv[])
     mpz_t r;
 
     mpz_init(r);
-    mpz_set_str(r, argv[1], 10);
+    mpz_set_str(r, argv[2], 10);
 
     pcs_t_import_public_key(v.pk, chunk.memory);
     pcs_t_encrypt(v.pk, v.hr, r, r);
@@ -135,7 +141,8 @@ int main(int argc, char *argv[])
     cout << req;
 
     curl_handle = curl_easy_init();
-    curl_easy_setopt(curl_handle, CURLOPT_URL, "http://127.0.0.1:40001/post_vote");
+    snprintf(snpbuf, 256, "http://%s/post_vote", addr);
+    curl_easy_setopt(curl_handle, CURLOPT_URL, snpbuf);
     /* Now specify the POST data */
     curl_easy_setopt(curl_handle, CURLOPT_POSTFIELDS, req.c_str());
     curl_easy_setopt(curl_handle, CURLOPT_POSTFIELDSIZE, req.length());
