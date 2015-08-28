@@ -16,7 +16,7 @@ public:
     string tally;
     string public_key;
     pcs_t_public_key *pk;
-    hcs_rand *hr;
+    hcs_random *hr;
     mpz_t t1, t2, tally_mpz, share_mpz;
     int servers_seen;
 
@@ -56,15 +56,17 @@ public:
     }
 
     void sum_shares(void) {
-        mpz_t share_loc[pk->l];
-        for (int i = 0; i < pk->l; ++i) mpz_init(share_loc[i]);
-        mpz_set_ui(share_mpz, 0);
+        hcs_shares *hs = hcs_init_shares(pk->l);
 
         int j = 0;
-        for (auto &i : shares) mpz_set_str(share_loc[j++], i.c_str(), 62);
+        for (auto &i : shares) {
+            mpz_set_str(hs->shares[j], i.c_str(), 62);
+            hs->flag[j] = 1;
+            ++j;
+        }
 
-        pcs_t_share_combine(pk, share_mpz, share_loc);
-        for (int i = 0; i < pk->l; ++i) mpz_clear(share_loc[i]);
+        pcs_t_share_combine(pk, share_mpz, hs);
+        hcs_free_shares(hs);
     }
 
     void add_vote(string vote) {

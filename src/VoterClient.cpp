@@ -7,7 +7,7 @@ class Voter {
 
 public:
     pcs_t_public_key *pk;
-    hcs_rand *hr;
+    hcs_random *hr;
     mpz_t rop;
 
     Voter() {

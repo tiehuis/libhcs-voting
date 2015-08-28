@@ -11,8 +11,8 @@ class SetupServer {
     private:
         pcs_t_public_key *pk;
         pcs_t_private_key *vk;
-        pcs_t_poly *px;
-        hcs_rand *hr;
+        pcs_t_polynomial *px;
+        hcs_random *hr;
         unsigned long s;
         unsigned long l;
         unsigned long ars;
