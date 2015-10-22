@@ -22,13 +22,13 @@ public:
 
     PublicBoard() : frozen(0), servers_seen(0) {
         pk = pcs_t_init_public_key();
-        hr = hcs_init_rand();
+        hr = hcs_init_random();
         mpz_inits(t1, t2, tally_mpz, share_mpz, NULL);
     }
 
     ~PublicBoard() {
         pcs_t_free_public_key(pk);
-        hcs_free_rand(hr);
+        hcs_free_random(hr);
         mpz_clears(t1, t2, tally_mpz, share_mpz, NULL);
     }
 

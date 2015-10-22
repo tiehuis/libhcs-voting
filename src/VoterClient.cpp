@@ -12,13 +12,13 @@ public:
 
     Voter() {
         mpz_init(rop);
-        hr = hcs_init_rand();
+        hr = hcs_init_random();
         pk = pcs_t_init_public_key();
     }
 
     ~Voter() {
         mpz_clear(rop);
-        hcs_free_rand(hr);
+        hcs_free_random(hr);
         pcs_t_free_public_key(pk);
     }
 

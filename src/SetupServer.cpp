@@ -21,7 +21,7 @@ class SetupServer {
         SetupServer(unsigned long s_, unsigned long l_) : s(s_), l(l_), ars(0) {
             pk = pcs_t_init_public_key();
             vk = pcs_t_init_private_key();
-            hr = hcs_init_rand();
+            hr = hcs_init_random();
 
             /* Need to improve safe prime generation performance before using
              * larger primes here. */
@@ -33,7 +33,7 @@ class SetupServer {
             pcs_t_free_public_key(pk);
             pcs_t_free_private_key(vk);
             pcs_t_free_polynomial(px);
-            hcs_free_rand(hr);
+            hcs_free_random(hr);
         }
 
         unsigned long auth_req_seen() {
